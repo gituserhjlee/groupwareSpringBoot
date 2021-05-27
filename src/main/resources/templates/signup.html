@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <div th:replace="header :: header"></div>
+    <title>CorupWare 회원가입</title>
+    <script>
+        function daumPostcode() {
+            new daum.Postcode(
+                {
+                    oncomplete: function (data) {
+                        var fullAddr = '';
+                        var extraAddr = '';
+                        if (data.userSelectedType === 'R') { //도로명 주소
+                            fullAddr = data.roadAddress;
+                        } else { //지번 주소
+                            fullAddr = data.jibunAddress;
+                        }
+                        if (data.userSelectedType === 'R') {
+                            //법정동명이 있을 경우 추가한다.
+                            if (data.bname !== '') {
+                                extraAddr += data.bname;
+                            }
+                            // 건물명이 있을 경우 추가한다.
+                            if (data.buildingName !== '') {
+                                extraAddr += (extraAddr !== '' ? ', '
+                                    + data.buildingName : data.buildingName);
+                            }
+                            // 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+                            fullAddr += (extraAddr !== '' ? ' (' + extraAddr
+                                + ')' : '');
+                        }
+                        // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                        document.getElementById('zip').value = data.zonecode; //5자리 새우편번호 사용
+                        document.getElementById('addr1').value = fullAddr;
+                        // 커서를 상세주소 필드로 이동한다.
+                        document.getElementById('addr2').focus();
+                    }
+                }).open();
+        }
+
+    </script>
+    <style>
+        .content {
+            width: 100%;
+            height: auto;
+            background-color: #045738;
+
+        }
+
+        .content h1 {
+            top: 10px;
+            left: 10px;
+            position: fixed;
+            color: gainsboro;
+            padding: 10px;
+            font-style: italic;
+
+        }
+
+        .content div {
+            margin: auto;
+            text-align: center;
+            padding-top: 10px;
+        }
+
+        .content div h2 {
+            color: gainsboro;
+
+        }
+
+        .content form {
+            width: 40%;
+            display: inline-block;
+            font-size: small;
+            color: white;
+            margin: 50px 0;
+
+        }
+
+        .content form label, button {
+            float: left;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <h1 onclick="location.href='login.html'" th:onclick=="|location.href='@{/login}'|">CorupWare</h1>
+    <div>
+        <h2>회원가입</h2>
+        <form th:action="@{/signup}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="custom-file">
+                <label for="customFile">사진</label>
+                <input type="file" class="form-control-file" id="customFile" name="files">
+            </div>
+            <br>
+            <br>
+            <div class="form-group">
+                <label for="id">사원번호</label>
+                <input type="text" class="form-control" id="id" name="employeeNum"
+                       placeholder="Enter your Employee Number">
+            </div>
+            <br>
+
+            <div class="form-group">
+                <label for="pwd">비밀번호</label>
+                <input type="password" class="form-control" id="pwd" placeholder="Enter your Password" name="password">
+            </div>
+            <br>
+
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter your name" name="name">
+            </div>
+            <br>
+
+            <label class="my-1 mr-2" for="department">부서명</label>
+            <select class="custom-select my-1 mr-sm-2" id="department" name="department">
+                <option th:each="d : ${T(myproject.groupware.entity.Department).values()}"
+                        th:value="${d.name()}"
+                        th:text="${d.name()}">
+                    val
+                </option>
+            </select>
+            <br>
+
+            <label class="my-1 mr-2" for="rank">직급명</label>
+            <select class="custom-select my-1 mr-sm-2" id="rank" name="rank">
+                <option th:each="rank : ${T(myproject.groupware.entity.Rank).values()}"
+                        th:value="${rank.name()}"
+                        th:text="${rank.name()}">
+                    val
+                </option>
+            </select>
+            <br>
+
+            <div class="form-group">
+                <label for="tel">휴대폰 번호</label>
+                <input type="tel" class="form-control" id="tel" placeholder="Enter your Phone number" name="phone">
+            </div>
+            <br>
+
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address">
+            </div>
+            <br>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-secondary" onclick="daumPostcode();">우편번호</button>
+                <input class="form-control" type="text" name="zip" id="zip" readonly="readonly" placeholder="우편번호">
+            </div>
+            <br>
+
+            <div class="form-group">
+                <label for="addr1">기본주소</label>
+                <input type="text" class="form-control" id="addr1" placeholder="Enter your address" name="address1" readonly="readonly">
+            </div>
+            <br>
+
+            <div class="form-group">
+                <label for="addr2">상세주소</label>
+                <input type="text" class="form-control" id="addr2" placeholder="Enter your address" name="address2">
+            </div>
+            <br>
+
+            <div class="form-group">
+                <label for="call">회사전화</label>
+                <input type="tel" class="form-control" id="call" name="companyPhone" placeholder="Enter your company phone number">
+            </div>
+            <br>
+            <button type="submit" class="btn btn-secondary btn-lg btn-block">submit
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
