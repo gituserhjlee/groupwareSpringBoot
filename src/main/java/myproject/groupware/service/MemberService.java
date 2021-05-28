@@ -26,13 +26,13 @@ public class MemberService implements UserDetailsService {
                 .orElseThrow(()->new UsernameNotFoundException(employeeNum));
     }
 
-    public void insertUser(Member user, String filePath) {
+    public Member insertUser(Member user) {
         BCryptPasswordEncoder encoder=new BCryptPasswordEncoder();
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setSaveFileName(filePath);
         user.setAuth(Auth.준회원);
         Date now=new Date();
         user.setEnteredDate(now);
-        memberRepository.save(user);
+        return memberRepository.save(user);
+
     }
 }

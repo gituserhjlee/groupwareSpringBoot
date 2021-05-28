@@ -1,9 +1,11 @@
 package myproject.groupware.controller;
 
 import lombok.RequiredArgsConstructor;
+import myproject.groupware.dto.FileDto;
 import myproject.groupware.entity.Member;
-import myproject.groupware.repository.MemberRepository;
+import myproject.groupware.service.FileService;
 import myproject.groupware.service.MemberService;
+import myproject.groupware.util.MD5Generator;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
@@ -17,15 +19,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 
 @Controller
 @RequiredArgsConstructor
 public class indexController {
 
     private final MemberService memberService;
+    private final FileService fileService;
 
     @GetMapping("/")
-    public String main() {
+    public String main(Model model) {
+        Member member = (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        model.addAttribute("member", member);
+        String file = member.getFileId().getFilename();
+        model.addAttribute("photo", file);
         return "index";
     }
 
@@ -48,16 +57,32 @@ public class indexController {
 
     @PostMapping("/signup")
     public String signUpSubmit(Member user, @RequestParam MultipartFile files) throws IOException {
-        String baseDir = "C:" + File.separator + "temp";
-        String filePath = baseDir + File.separator + files.getOriginalFilename();
+
+        String origFilename = files.getOriginalFilename();
+        String fileExt = origFilename.substring(origFilename.lastIndexOf("."));
+        String filename = String.format("%1$tY%1$tm%1$td%1$tH%1$tM%1$tS",
+                Calendar.getInstance());
+        filename += System.nanoTime();
+        filename += fileExt;
+        String savePath = "D:\\바탕화면\\스프링자료\\groupware\\src\\main\\resources\\static\\img\\userphotos";/* 실행되는 위치의 'files' 폴더에 파일이 저장됩니다. */
+
+        String filePath = savePath + File.separator + filename;
         files.transferTo(new File(filePath));
 
-        try {
-            memberService.insertUser(user, filePath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        FileDto fileDto = new FileDto();
+        fileDto.setOrigFilename(origFilename);
+        fileDto.setFilename(filename);
+        fileDto.setFilePath(filePath);
+
+        myproject.groupware.entity.File file = fileDto.toEntity();
+        user.setFileId(file);
+        file.setMember(user);
+        memberService.insertUser(user);
+        fileService.saveFile(file);
+
+
         return "redirect:/login";
     }
+
 
 }

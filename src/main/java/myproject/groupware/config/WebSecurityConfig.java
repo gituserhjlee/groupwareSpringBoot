@@ -28,7 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // Spring 
 
     @Override
     public void configure(WebSecurity web) throws Exception { // 인증을 무시할 경로, static 하위 파일 목록(css, js, img) 인증 무시
-        web.ignoring().antMatchers("/css/**", "/js/**", "/img/**");
+        web.ignoring().antMatchers("/css/**", "/js/**", "/img/**","/sass/**","/webfonts/**");
     }
 
     @Override

@@ -22,7 +22,7 @@ public class Member implements UserDetails {
 
     @Id
     @Column(name = "employeeNum", unique = true)
-    private String employeeNum ;
+    private String employeeNum;
 
     @Column(name = "password")
     private String password;
@@ -51,8 +51,9 @@ public class Member implements UserDetails {
     @Column(name = "enteredDate")
     private Date enteredDate;
 
-    @Column(name = "saveFileName")
-    private String saveFileName;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "file_id")
+    private File fileId;
 
     @Enumerated(EnumType.STRING)
     private Department department;

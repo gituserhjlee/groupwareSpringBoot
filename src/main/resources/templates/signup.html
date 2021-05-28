@@ -4,6 +4,21 @@
     <div th:replace="header :: header"></div>
     <title>CorupWare 회원가입</title>
     <script>
+        function filecheck(){
+            var f=document.myform;
+            if(f.files.value!=""){
+                if(! /(\.gif|\.jpg|\.png|\.jpeg)$/i.test(f.files.value)) {
+                    alert("이미지 파일만 가능합니다.");
+                    f.files.focus();
+                    return false;
+                }
+            }else{
+                alert("사진을 반드시 등록하세요");
+                f.files.focus();
+                return false;
+            }
+            return true;
+        }
         function daumPostcode() {
             new daum.Postcode(
                 {
@@ -42,9 +57,22 @@
     <style>
         .content {
             width: 100%;
-            height: auto;
-            background-color: #045738;
-
+            height: 1280px;
+            background-size: cover;
+            position: relative;
+            z-index: 1;
+        }
+        .content::after{
+            background-image: url("/img/company.jpg");
+            opacity: 0.8;
+            width: 100%;
+            height: 1280px;
+            background-size: cover;
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
         }
 
         .content h1 {
@@ -87,12 +115,18 @@
     <h1 onclick="location.href='login.html'" th:onclick=="|location.href='@{/login}'|">CorupWare</h1>
     <div>
         <h2>회원가입</h2>
-        <form th:action="@{/signup}" method="POST" enctype="multipart/form-data">
+        <form name="myform" th:action="@{/signup}" method="POST" enctype="multipart/form-data" onsubmit="return filecheck()";>
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <div class="custom-file">
-                <label for="customFile">사진</label>
-                <input type="file" class="form-control-file" id="customFile" name="files">
+                <label for="files">사진</label>
+                <input type="file" class="form-control-file" id="files" name="files">
             </div>
+<!--            -->
+<!--            <div class="custom-file" id="inputFile">-->
+<!--                <input name="file" type="file" class="custom-file-input" id="customFile">-->
+<!--                <label class="custom-file-label" for="customFile">파일을 선택해 주세요.</label>-->
+<!--            </div>-->
+<!--            -->
             <br>
             <br>
             <div class="form-group">
