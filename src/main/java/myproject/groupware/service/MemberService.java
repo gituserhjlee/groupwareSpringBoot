@@ -21,11 +21,7 @@ public class MemberService implements UserDetailsService {
 
     @Override
     public Member loadUserByUsername(String employeeNum) throws UsernameNotFoundException {
-        if (memberRepository.findByEmployeeNum(employeeNum)!=null){
-            System.out.println("널아님");
-        }else{
-            System.out.println("널");
-        }
+
         return memberRepository.findByEmployeeNum(employeeNum)
                 .orElseThrow(()->new UsernameNotFoundException(employeeNum));
     }
